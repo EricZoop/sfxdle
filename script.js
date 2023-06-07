@@ -28,9 +28,17 @@ var audioPaths = [
     'csgo sfx/nova-1.wav',
     'csgo sfx/p90_01.wav',
     'csgo sfx/p250_01.wav',
-
-
-    
+    'csgo sfx/revolver-1_01.wav',
+    'csgo sfx/sawedoff-1.wav',
+    'csgo sfx/scar20_01.wav',
+    'csgo sfx/sg556_01.wav',
+    'csgo sfx/ssg08_01.wav',
+    'csgo sfx/stilletto_draw_01.wav',
+    'csgo sfx/taser_shoot.wav',
+    'csgo sfx/tec9_02.wav',
+    'csgo sfx/ump45_02.wav',
+    'csgo sfx/usp_01.wav',
+    'csgo sfx/xm1014-1.wav'
 
     // Add more audio paths as needed
 ];
