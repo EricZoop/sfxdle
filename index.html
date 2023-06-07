@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SFX Guesser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #444444;
+        }
+    
+        h1 {
+            color: #F7921D;
+        }
+    
+        .game-container {
+            margin-top: 50px;
+        }
+    
+        .play-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #F7921D;
+            color: #FFF;
+            border: none;
+            cursor: pointer;
+        }
+    
+        .play-button:hover {
+            background-color: #E67E17;
+        }
+    
+        .guess-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #F7921D;
+            color: #FFF;
+            border: none;
+            cursor: pointer;
+        }
+    
+        .guess-button:hover {
+            background-color: #E67E17;
+        }
+    
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #FFF;
+        }
+    
+        .checkmark {
+            color: #4CAF50;
+            visibility: hidden;
+        }
+    
+        .incorrect {
+            color: #FF0000;
+            visibility: hidden;
+        }
+    
+        .next-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #F7921D;
+            color: #FFF;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    
+        .next-button:hover {
+            background-color: #E67E17;
+        }
+    
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+    
+        .dropdown-container input[type="text"] {
+            width: 200px;
+            padding: 5px;
+            font-size: 16px;
+            background-color: #FFF;
+            border: 1px solid #DDD;
+        }
+    
+        .dropdown-container .dropdown-content {
+            position: absolute;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #FFF;
+            border: 1px solid #DDD;
+            z-index: 1;
+        }
+    
+        .dropdown-container .dropdown-content a {
+            display: block;
+            padding: 10px;
+            cursor: pointer;
+        }
+    
+        .dropdown-container .dropdown-content a:hover {
+            background-color: #F1F1F1;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SoundFX Guesser</h1>
+    <div class="game-container">
+        <button class="play-button" onclick="playSound()">Play Sound</button>
+        <p class="message" id="message"></p>
+        <select id="sound-select" onchange="checkSelection()">
+            <option value="" selected disabled>Select a sound</option>
+            <option value="csgo sfx/ak47_01.wav">AK-47</option>
+            <option value="csgo sfx/aug_01.wav">AUG</option>
+            <option value="csgo sfx/awp_01.wav">AWP</option>
+            <option value="csgo sfx/bizon_01.wav">PP-Bizon</option>
+            <option value="csgo sfx/butterfly_knife.wav">Butterfly Knife</option>
+            <option value="csgo sfx/c4_initiate.wav">C4</option>
+            <option value="csgo sfx/cz75_01.wav">CZ75-Auto</option>
+            <option value="csgo sfx/deagle_01.wav">Desert Eagle</option>
+            <option value="csgo sfx/elites_01.wav">Duel Berretas</option>
+            <option value="csgo sfx/famas_01.wav">FAMAS</option>
+            <option value="csgo sfx/fiveseven_01.wav">Five-SeveN</option>
+            <option value="csgo sfx/flashbang_explode1.wav">Flashbang</option>
+            <option value="csgo sfx/g3sg1_01.wav">G3SG1</option>
+            <option value="csgo sfx/galil_01.wav">Galil AR</option>
+            <option value="csgo sfx/glock_01.wav">Glock-18</option>
+            <option value="csgo sfx/knife_bowie_draw.wav">Bowie Knife</option>
+            <option value="csgo sfx/knife_falchion_draw.wav">Falchion Knife</option>
+            <option value="csgo sfx/m4a1_silencer_01.wav">M4A1-S</option>
+            <option value="csgo sfx/m4a4_01.wav">M4A4</option>
+            <option value="csgo sfx/m249-1.wav">M249</option>
+            <option value="csgo sfx/mac10_01.wav">MAC-10</option>
+            <option value="csgo sfx/mag7_01.wav">MAG-7</option>
+            <option value="csgo sfx/.wav"></option>
+            <option value="csgo sfx/.wav"></option>
+            <option value="csgo sfx/.wav"></option>
+            <option value="csgo sfx/.wav"></option>
+            <option value="csgo sfx/.wav"></option>
+            <option value="csgo sfx/.wav"></option>
+            <option value="csgo sfx/.wav"></option>
+            <option value="csgo sfx/.wav"></option>
+            <option value="csgo sfx/.wav"></option>
+            <option value="csgo sfx/.wav"></option>
+
+
+
+
+
+            <!-- Add more options as needed -->
+        </select>
+        <span class="checkmark" id="checkmark">&#10003;</span>
+        <span class="incorrect" id="incorrect">&#10007;</span>
+        <button class="guess-button" onclick="confirmGuess()">Confirm Guess</button>
+        <br>
+        <button class="next-button" onclick="nextQuestion()" style="display: none;">Next Question</button>
+    </div>
+    <canvas id="visualizer" width="600" height="150"></canvas>
+
+    <script>
+        var audioPaths = [
+            'csgo sfx/ak47_01.wav', //replace for CS2
+            'csgo sfx/aug_01.wav',
+            'csgo sfx/awp_01.wav',
+            'csgo sfx/bizon_01.wav',
+            'csgo sfx/butterfly_knife.wav',
+            'csgo sfx/c4_initiate.wav',
+            'csgo sfx/cz75_01.wav',
+            'csgo sfx/deagle_01.wav',
+            'csgo sfx/elites_01.wav.wav',
+            'csgo sfx/famas_01.wav', //replace for CS2
+            'csgo sfx/fiveseven_01.wav',
+            'csgo sfx/flashbang_explode1.wav',
+            'csgo sfx/g3sg1_01.wav',
+            'csgo sfx/galil_01.wav',
+            'csgo sfx/glock_01.wav',
+            'csgo sfx/knife_bowie_draw.wav',
+            'csgo sfx/knife_falchion_draw.wav',
+            'csgo sfx/m4a1_silencer_01.wav',
+            'csgo sfx/m4a4_01.wav',
+            'csgo sfx/m249-1.wav',
+            'csgo sfx/mac10_01.wav',
+            'csgo sfx/mag7_01.wav',
+            'csgo sfx/mp5_01.wav',
+            'csgo sfx/mp7_01.wav',
+            'csgo sfx/mp9_01.wav',
+            'csgo sfx/negev_01.wav',
+            'csgo sfx/nova-1.wav',
+            'csgo sfx/p90_01.wav',
+            'csgo sfx/p250_01.wav',
+
+
+            
+
+            // Add more audio paths as needed
+        ];
+
+        var selectedSound = getRandomAudio();
+        var isGuessingMode = false;
+        var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        var analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+
+        var canvas = document.getElementById('visualizer');
+        var canvasCtx = canvas.getContext('2d');
+
+        var audioElement = new Audio(selectedSound);
+        var audioSource = audioContext.createMediaElementSource(audioElement);
+        audioSource.connect(analyser);
+        audioSource.connect(audioContext.destination);
+
+        var bufferLength = analyser.frequencyBinCount;
+        var dataArray = new Uint8Array(bufferLength);
+
+        function playSound() {
+            if (!isGuessingMode) {
+                audioElement = new Audio(selectedSound);
+                audioSource = audioContext.createMediaElementSource(audioElement);
+                audioSource.connect(analyser);
+                audioSource.connect(audioContext.destination);
+                audioElement.play();
+                requestAnimationFrame(drawVisualizer);
+            }
+        }
+
+        function checkSelection() {
+            var selectElement = document.getElementById('sound-select');
+            var incorrect = document.getElementById('incorrect');
+            incorrect.style.visibility = 'hidden';
+        }
+
+        function confirmGuess() {
+            var selectElement = document.getElementById('sound-select');
+            var checkmark = document.getElementById('checkmark');
+            var incorrect = document.getElementById('incorrect');
+
+            if (selectElement.value === selectedSound) {
+                checkmark.style.visibility = 'visible';
+                incorrect.style.visibility = 'hidden';
+
+                // Reset the dropdown menu
+                selectElement.value = '';
+
+                // Disable guess button and enable next button
+                var guessButton = document.getElementsByClassName('guess-button')[0];
+                guessButton.disabled = true;
+
+                var nextButton = document.getElementsByClassName('next-button')[0];
+                nextButton.style.display = 'inline-block';
+
+                // Display success message
+                var message = document.getElementById('message');
+
+            } else {
+                checkmark.style.visibility = 'hidden';
+                incorrect.style.visibility = 'visible';
+            }
+        }
+
+        function nextQuestion() {
+            // Enable guess button and disable next button
+            var guessButton = document.getElementsByClassName('guess-button')[0];
+            guessButton.disabled = false;
+
+            var nextButton = document.getElementsByClassName('next-button')[0];
+            nextButton.style.display = 'none';
+
+            // Generate a new random audio for the next round
+            selectedSound = getRandomAudio();
+
+            // Clear the checkmark, incorrect symbol, and message
+            var checkmark = document.getElementById('checkmark');
+            var incorrect = document.getElementById('incorrect');
+            var message = document.getElementById('message');
+
+            checkmark.style.visibility = 'hidden';
+            incorrect.style.visibility = 'hidden';
+            message.innerHTML = '';
+
+            // Play the new audio
+            playSound();
+        }
+
+        function getRandomAudio() {
+            var randomIndex = Math.floor(Math.random() * audioPaths.length);
+            return audioPaths[randomIndex];
+        }
+
+        function drawVisualizer() {
+            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+            analyser.getByteTimeDomainData(dataArray);
+
+            canvasCtx.lineWidth = 2;
+            canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
+            canvasCtx.beginPath();
+
+            var sliceWidth = canvas.width * 1.0 / bufferLength;
+            var x = 0;
+
+            for (var i = 0; i < bufferLength; i++) {
+                var v = dataArray[i] / 128.0;
+                var y = v * canvas.height / 2;
+
+                if (i === 0) {
+                    canvasCtx.moveTo(x, y);
+                } else {
+                    canvasCtx.lineTo(x, y);
+                }
+
+                x += sliceWidth;
+            }
+
+            canvasCtx.lineTo(canvas.width, canvas.height / 2);
+            canvasCtx.stroke();
+
+            requestAnimationFrame(drawVisualizer);
+        }
+    </script>
+</body>
+</html>
